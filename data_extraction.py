@@ -2,8 +2,8 @@
 # The methods contained will be fit to extract data from a particular data source, these sources will include CSV files, an API and an S3 bucket.
 import pandas as pd
 
-#Shouldn't I import SQLAlchemy modules?
-#Should I create another engine?
+####Shouldn't I import SQLAlchemy modules?
+####Should I create another engine, there is already one in the database_utils.py in a method?
 class DataExtractor:
     def __init__(self,engine):
         self.engine = engine
