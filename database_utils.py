@@ -21,6 +21,21 @@ class DatabaseConnector:
         engine = create_engine(db_url)
         return engine
     
+    # Loads local credintials for local engine
+    def read_local_creds(self):
+        with open('local_creds.yaml','r') as file:
+            local_cred = yaml.safe_load(file)
+        return local_cred
+    
+    # Create local sqlalchemy engine
+    def local_db_engine(self,local_cred):
+        # Construct database connection URL
+        db_url = f"postgresql://{local_cred['RDS_USER']}:{local_cred['RDS_PASSWORD']}@{local_cred['RDS_HOST']}:{local_cred['RDS_PORT']}/{local_cred['RDS_DATABASE']}"
+        # Create local engine 
+        local_engine = create_engine(db_url)
+        return local_engine
+
+    
     #Lists all the tables in the database so you know which tables you can extract data from.
     def list_db_tables(self,engine):
         inspector = inspect(engine)
