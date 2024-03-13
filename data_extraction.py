@@ -1,8 +1,8 @@
 # This class will work as a utility class, in it you will be creating methods that help extract data from different data sources.
 # The methods contained will be fit to extract data from a particular data source, these sources will include CSV files, an API and an S3 bucket.
 import pandas as pd
+import tabula as tb
 
-####Should I create another engine, there is already one in the database_utils.py in a method?
 class DataExtractor:
     def __init__(self,engine):
         self.engine = engine
@@ -28,4 +28,10 @@ class DataExtractor:
         # Extract the table containing user data and return a pandas DataFrame.
         # ext_data, columns = tables
         df = pd.read_sql_table(table_name,self.engine)
+        return df
+    
+    # Takes pdf in a link as an argument and returns a pandas DataFrame.
+    def retrieve_pdf_data(self,file_link):
+        list_data = tb.read_pdf(file_link,pages="all")
+        df = pd.DataFrame(list_data)
         return df

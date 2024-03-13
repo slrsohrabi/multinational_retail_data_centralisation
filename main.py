@@ -1,12 +1,18 @@
+from data_extraction import DataExtractor
 from database_utils import DatabaseConnector
-from data_upload import DataLoader
+#from data_upload import DataLoader
 # from data_extraction import DataExtractor
 #from data_cleaning import DataCleaning
 
 import pandas as pd
-
 def main():
-
+    link = "https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf"
+    db_connector = DatabaseConnector()
+    cred_data = db_connector.read_db_creds()
+    engine = db_connector.init_db_engine(cred_data)
+    pdf_extractor = DataExtractor(engine)
+    df = pdf_extractor.retrieve_pdf_data(link)
+    print(df)
 
     """ # Uploading to postgres database 
     
