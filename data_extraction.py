@@ -33,5 +33,6 @@ class DataExtractor:
     # Takes pdf in a link as an argument and returns a pandas DataFrame.
     def retrieve_pdf_data(self,file_link):
         list_data = tb.read_pdf(file_link,pages="all")
-        df = pd.DataFrame(list_data)
-        return df
+        # df = pd.concat(list_data)
+        return list_data
+    

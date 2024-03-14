@@ -11,14 +11,13 @@ class DataCleaning:
     def clean_user_data(self,df):
         df = df.dropna()
         df = df.drop_duplicates()
-        #df = df.drop(columns="unnamed")
-
+        
         # Cleans date_columns
         date_columns = ['date_of_birth','join_date']
         for column in date_columns:
             df[column] = pd.to_datetime(df[column],errors='coerce')
         
-        # clean email
+        # clean email(did not clean email yet cus home address of the missing ones is available)
         
         
         # Clean phone number
