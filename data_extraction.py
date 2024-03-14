@@ -35,4 +35,3 @@ class DataExtractor:
         list_data = tb.read_pdf(file_link,pages="all")
         # df = pd.concat(list_data)
         return list_data
-    

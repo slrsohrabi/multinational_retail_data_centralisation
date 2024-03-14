@@ -17,10 +17,51 @@ class DataCleaning:
         for column in date_columns:
             df[column] = pd.to_datetime(df[column],errors='coerce')
         
-        # clean email(did not clean email yet cus home address of the missing ones is available)
+        # clean email using email regex from regexlib.com
+        email_regex = '^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$'
+        df.loc[~df['email_address'].str.match(email_regex), 'email_address'] = np.nan 
+
+        # Cleans alphabetical columns
+        alpha_column = ['first_name','last_name','company','country','country_code']
+        for column in alpha_column:
+            df[column] = df[column].apply(self.keep_alpha)
+        
+        # Clean country code
+        df = df[df['country_code'].isin(['GB', 'DE', 'US'])]
+
+        df = df.reset_index(drop=True)
+
+        return df
+    # Method to only keep alphabetical values
+    def keep_alpha(self,val):
+        return ''.join(filter(str.isalpha, str(val)))
+
+    def clean_card_data(self,df):
+        df = df.dropna()
+        df = df.drop_duplicates()
+        
+        # Date columns cleaned
+        date_columns = ['expiry_date','date_payment_confirmed']
+        for column in date_columns:
+            df[column] = pd.to_datetime(df[column],errors='coerce')
+
+        # # only acceptable providers
+        # df = df[df['card_provider'].isin([])]
+    
+        # card number regex
         
         
-        # Clean phone number
+
+
+
+
+
+
+
+
+
+
+       # Clean phone number
 
         ###help!
         """ 
@@ -51,18 +92,3 @@ class DataCleaning:
             df.loc[~df['phone_number'].str.match(de_regex_exp), 'phone_number'] = np.nan # For every row  where the 'phone_number' column does not match the country expression, replace the value with NaN
  """
         
-        
-        # Cleans alphabetical columns
-        alpha_column = ['first_name','last_name','company','country','country_code']
-        for column in alpha_column:
-            df[column] = df[column].apply(self.keep_alpha)
-        
-        # Clean country code
-        df = df[df['country_code'].isin(['GB', 'DE', 'US'])]
-
-        df = df.reset_index(drop=True)
-
-        return df
-    # Method to only keep alphabetical values
-    def keep_alpha(self,val):
-        return ''.join(filter(str.isalpha, str(val)))
