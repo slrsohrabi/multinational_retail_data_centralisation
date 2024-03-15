@@ -2,6 +2,7 @@
 # look out for NULL values, errors with dates, incorrectly typed values and rows filled with the wrong information.
 import pandas as pd
 import numpy as np
+import yaml
 
 class DataCleaning:
     def __init__(self):
@@ -19,7 +20,7 @@ class DataCleaning:
         
         # clean email using email regex from regexlib.com
         email_regex = '^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$'
-        df.loc[~df['email_address'].str.match(email_regex), 'email_address'] = np.nan 
+        df.loc[~df['email_address'].str.match(email_regex),'email_address'] = np.nan 
 
         # Cleans alphabetical columns
         alpha_column = ['first_name','last_name','company','country','country_code']
@@ -39,29 +40,22 @@ class DataCleaning:
     def clean_card_data(self,df):
         df = df.dropna()
         df = df.drop_duplicates()
-        
         # Date columns cleaned
-        date_columns = ['expiry_date','date_payment_confirmed']
-        for column in date_columns:
-            df[column] = pd.to_datetime(df[column],errors='coerce')
+        df['expiry_date'] = pd.to_datetime(df['expiry_date'],format='%m/%y',errors='coerce')
+        df['date_payment_confirmed'] = df['date_payment_confirmed'].str.strip()
+        df['date_payment_confirmed'] = pd.to_datetime(df['date_payment_confirmed'],format='%Y-%m-%d',errors='coerce')
+        # df['card_provider'] = 
+        return df
+    
+    def read_bank_regex():
+        with open('bank_regex.yaml','r') as file:
+            bank_regex = yaml.safe_load(file)
+        return bank_regex
 
         # # only acceptable providers
         # df = df[df['card_provider'].isin([])]
-    
         # card number regex
-        
-        
-
-
-
-
-
-
-
-
-
-
-       # Clean phone number
+        # Clean phone number
 
         ###help!
         """ 
