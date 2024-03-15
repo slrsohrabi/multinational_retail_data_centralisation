@@ -2,6 +2,7 @@
 # The methods contained will be fit to extract data from a particular data source, these sources will include CSV files, an API and an S3 bucket.
 import pandas as pd
 import tabula as tb
+import requests
 
 class DataExtractor:
     def __init__(self,engine):
@@ -35,3 +36,14 @@ class DataExtractor:
         list_data = tb.read_pdf(file_link,pages="all")
         # df = pd.concat(list_data)
         return list_data
+    
+    #  takes in a link as an argument and returns a pandas DataFrame.
+    def list_number_of_stores(self,storenum_endp,header_dict):
+        response = requests.get(storenum_endp, headers=header_dict)
+        if response.status_code == 200:
+            data = response.json()
+            store_num = data['count']
+            return store_num
+        else:
+            print("Error:", response.status_code)
+            return None
