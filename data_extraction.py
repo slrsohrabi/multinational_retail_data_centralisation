@@ -20,7 +20,7 @@ class DataExtractor:
             columns = result.keys()
         return data, columns
     
-   # Method to extract the database table to a pandas DataFrame.
+   # SQL,AWS dta extraction
     def read_rds_table(self, table_name):
         # Get the names of all tables in the database
         # tables = self.list_db_tables(table_name)
@@ -31,7 +31,7 @@ class DataExtractor:
         df = pd.read_sql_table(table_name,self.engine)
         return df
     
-    # Takes pdf in a link as an argument and returns a pandas DataFrame.
+    # pdf data Extraction
     def retrieve_pdf_data(self,file_link):
         # list_data = tb.read_pdf(file_link,pages="all")
         # Read the PDF and extract all tables from all pages
@@ -44,7 +44,7 @@ class DataExtractor:
     
 
 
-        #  takes in a link as an argument and returns a pandas DataFrame.
+    #  takes in a link as an argument and returns a pandas DataFrame.
     def list_number_of_stores(self,storenum_endp,header_dict):
         response = requests.get(storenum_endp, headers=header_dict)
         print(type(response))
@@ -57,7 +57,7 @@ class DataExtractor:
             print("Error:", response.status_code)
             return None 
     
-    #  takes in a link as an argument and returns each row of store data 
+    #  API data extraction
     def retrieve_stores_data(self,store_ret_end,header_dict):
         response = requests.get(store_ret_end, headers=header_dict)
         if response.status_code == 200:
