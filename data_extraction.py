@@ -33,17 +33,38 @@ class DataExtractor:
     
     # Takes pdf in a link as an argument and returns a pandas DataFrame.
     def retrieve_pdf_data(self,file_link):
-        list_data = tb.read_pdf(file_link,pages="all")
+        # list_data = tb.read_pdf(file_link,pages="all")
+        # Read the PDF and extract all tables from all pages
+        tables = tb.read_pdf(file_link, pages='all', multiple_tables=True)
+        # Concatenate all tables into a single DataFrame
+        combined_df = pd.concat(tables, ignore_index=True)
+
         # df = pd.concat(list_data)
-        return list_data
+        return combined_df
     
-    #  takes in a link as an argument and returns a pandas DataFrame.
+
+
+        #  takes in a link as an argument and returns a pandas DataFrame.
     def list_number_of_stores(self,storenum_endp,header_dict):
         response = requests.get(storenum_endp, headers=header_dict)
+        print(type(response))
         if response.status_code == 200:
             data = response.json()
-            store_num = data['count']
+            print(data)
+            store_num = data
             return store_num
         else:
             print("Error:", response.status_code)
-            return None
+            return None 
+    
+    #  takes in a link as an argument and returns each row of store data 
+    def retrieve_stores_data(self,store_ret_end,header_dict):
+        response = requests.get(store_ret_end, headers=header_dict)
+        if response.status_code == 200:
+            data = response.json()
+            return data
+        else:
+            print("Error:", response.status_code)
+            return None 
+
+

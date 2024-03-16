@@ -15,21 +15,21 @@ class DataCleaning:
         
         # Cleans date_columns
         date_columns = ['date_of_birth','join_date']
-        for column in date_columns:
-            df[column] = pd.to_datetime(df[column],errors='coerce')
-        
+        # for column in date_columns:
+        #     df[column] = pd.to_datetime(df[column],format= '%Y-%m-%d',errors='coerce')
+        df['date_of_birth'] = pd.to_datetime(df['date_of_birth'],format= '%Y-%m-%d',errors='coerce')
+        df['join_date'] = pd.to_datetime(df['join_date'],format= '%Y-%m-%d',errors='coerce')
         # clean email using email regex from regexlib.com
-        email_regex = '^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$'
+        email_regex = '^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$'
         df.loc[~df['email_address'].str.match(email_regex),'email_address'] = np.nan 
 
         # Cleans alphabetical columns
         alpha_column = ['first_name','last_name','company','country','country_code']
         for column in alpha_column:
             df[column] = df[column].apply(self.keep_alpha)
-        
+
         # Clean country code
         df = df[df['country_code'].isin(['GB', 'DE', 'US'])]
-
         df = df.reset_index(drop=True)
 
         return df
@@ -51,6 +51,29 @@ class DataCleaning:
         with open('bank_regex.yaml','r') as file:
             bank_regex = yaml.safe_load(file)
         return bank_regex
+    
+    def clean_store_data(self,df):
+        # Clean by store type
+        store_types = ['Local','Super Store','Mall Kiosk','Outlet','Web Portal']
+        str_columns = ['address','locality','store_code','store_type','country_code']
+        df['store_type'] = df['store_type'].where(df['store_type'].isin(store_types), other=pd.NA)
+        # Drops obsolete columns
+        df = df.drop(['lat'], axis=1)  # Specify axis=1 to drop columns
+        # Clean datetime column
+        df['opening_date'] = pd.to_datetime(df['opening_date'],format='%Y-%m-%d',errors='coerce')
+        # clean alphabetical columns using the keep_alpha() function
+        df['locality'] = df['locality'].apply(self.keep_alpha)
+        for col in str_columns:
+            df[col] = df[col].astype(str)
+        # only keep numeric in the columns
+        df['staff_numbers'] = pd.to_numeric(df['staff_numbers'], errors='coerce')
+        df['latitude'] = pd.to_numeric(df['latitude'], errors='coerce')
+        df['longitude'] = pd.to_numeric(df['longitude'], errors='coerce')
+        df = df[df['country_code'].isin(['GB', 'DE', 'US'])]
+        df = df.dropna()
+        df = df.drop_duplicates()
+        return df 
+
 
         # # only acceptable providers
         # df = df[df['card_provider'].isin([])]
@@ -60,10 +83,6 @@ class DataCleaning:
         ###help!
         """ 
         df['phone_number'] = df['phone_number'].replace({r'\+44': '0', r'\(': '', r'\)': '', r'-': '', r' ': '',r'\^44': '0',r'(?<=\d)x(?=\d)': '#'}, regex=True)
-        uk_regex_exp = '^\s*\(?((\+0?44)?\)?[ \-]?(\(0\))|0)((20[7,8]{1}\)?[ \-]?[1-9]{1}[0-9]{2}[ \-]?[0-9]{4})|([1-8]{1}[0-9]{3}\)?[ \-]?[1-9]{1}[0-9]{2}[ \-]?[0-9]{3}))\s*$'    
-        us_regex_exp = '^(\(?\d\d\d\)?)?( |-|\.)?\d\d\d( |-|\.)?\d{4,4}(( |-|\.)?[ext\.]+ ?\d+)?$'
-        de_regex_exp = '^((00|\+)49)?(0?[2-9][0-9]{1,})$'
-
 
         # Create masks for each country
         uk_mask = (df['country_code'] == 'GB') & (~df['phone_number'].str.match(uk_regex_exp))
