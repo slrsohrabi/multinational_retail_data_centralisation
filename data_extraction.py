@@ -3,6 +3,7 @@
 import pandas as pd
 import tabula as tb
 import requests
+import boto3
 
 class DataExtractor:
     def __init__(self,engine):
@@ -66,5 +67,11 @@ class DataExtractor:
         else:
             print("Error:", response.status_code)
             return None 
-
+        
+    # data extraction from CSV format in an S3 bucket on AWS
+    def extract_from_s3(self,bucket_name,object_key):
+        s3 = boto3.client('s3')
+        obj = s3.get_object(Bucket=bucket_name, Key=object_key)
+        df = pd.read_csv(obj['Body'])
+        return df
 

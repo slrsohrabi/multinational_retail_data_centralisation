@@ -3,6 +3,7 @@
 import pandas as pd
 import numpy as np
 import yaml
+import re
 
 class DataCleaning:
     def __init__(self):
@@ -20,7 +21,7 @@ class DataCleaning:
         df['date_of_birth'] = pd.to_datetime(df['date_of_birth'],format= '%Y-%m-%d',errors='coerce')
         df['join_date'] = pd.to_datetime(df['join_date'],format= '%Y-%m-%d',errors='coerce')
         # clean email using email regex from regexlib.com
-        email_regex = '^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$'
+        email_regex = r'^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$'
         df.loc[~df['email_address'].str.match(email_regex),'email_address'] = np.nan 
 
         # Cleans alphabetical columns
@@ -31,6 +32,7 @@ class DataCleaning:
         # Clean country code
         df = df[df['country_code'].isin(['GB', 'DE', 'US'])]
         df = df.reset_index(drop=True)
+        df = df.dropna()
 
         return df
     # Method to only keep alphabetical values
@@ -47,11 +49,25 @@ class DataCleaning:
         # df['card_provider'] = 
         return df
     
+    # Read bank account number regex for each bank 
     def read_bank_regex():
         with open('bank_regex.yaml','r') as file:
             bank_regex = yaml.safe_load(file)
         return bank_regex
     
+    # Checks if value is float
+    def is_float(val):
+        try:
+            float_value = float(val)
+            return True
+        except ValueError:
+            return False
+    
+    def is_money(self, val):
+        val.split('')
+        
+
+          
     def clean_store_data(self,df):
         # Clean by store type
         store_types = ['Local','Super Store','Mall Kiosk','Outlet','Web Portal']
@@ -73,8 +89,68 @@ class DataCleaning:
         df = df.dropna()
         df = df.drop_duplicates()
         return df 
+    # converts all weights to "...kg"pattern
+    def convert_product_weights(self, val):
 
+        multi_pack_pattern_kg = r"\d+ x \d"
+        multi_pack_pattern_g = r"\d+ x \d+g"
+        if val.endswith('kg'):
+            kilograms = float(val[:-2])
+        elif val.endswith('g'):
+            if re.match(multi_pack_pattern_g, val):  # Check if it matches the multi-pack pattern
+                parts = val.split(' x ')
+                weight_per_unit = int(parts[0])
+                quantity = int(parts[1].replace('g', ''))
+                total_weight_g = weight_per_unit * quantity
+                kilograms = total_weight_g / 1000
+            else:
+                grams = float(val[:-1])
+                kilograms = grams / 1000
+        # elif val.endswith('l'):
+        #     liters = float(val[:-1])
+        #     kilograms = liters 
+        elif val.endswith('ml'):
+            liters =  float(val[:-2]) / 1000
+            kilograms = liters
 
+        elif re.match(multi_pack_pattern_kg, val):  # Check if it matches the multi-pack pattern
+            parts = val.split(' x ')
+            weight_per_unit = int(parts[0])
+            quantity = int(parts[1])
+            total_weight_g = weight_per_unit * quantity
+            kilograms = total_weight_g / 1000
+
+        elif val.endswith('m'):
+            liters = float(val[:-1])
+            kilograms = liters 
+        
+        elif val.endswith('oz'):
+            grams = float(val[:-2])
+            kilograms = grams / 1000
+
+        else:
+            return val
+    
+        return float(kilograms)
+
+    def clean_product_data(self,df):
+        removed_status = ['Still_avaliable', 'Removed'] 
+        ok_categories = ['toys-and-games', 'sports-and-leisure','pets', 'homeware','health-and-beauty','food-and-drink', 'diy']
+        df['removed'] = df['removed'].where(df['removed'].isin(removed_status), other=pd.NA)
+        df['weight'] = df['weight'].astype(str).apply(self.convert_product_weights)
+        df['date_added'] = pd.to_datetime(df['date_added'],format='%Y-%m-%d',errors='coerce')
+        # astype(str) method to convert the entire 'product_price' column to strings, ensuring that all values are treated as strings regardless of their original data types.
+        df['product_price'] = df['product_price'].astype(str)
+        # Replace values that don't start with '£' with NaN
+        df.loc[~df['product_price'].str.startswith('£'), 'product_price'] = pd.NA
+        df['category'] = df['category'].where(df['category'].isin(ok_categories), other=pd.NA)
+
+        
+        df = df.dropna()
+        df = df.drop_duplicates()
+        
+
+        return df
         # # only acceptable providers
         # df = df[df['card_provider'].isin([])]
         # card number regex
@@ -82,7 +158,6 @@ class DataCleaning:
 
         ###help!
         """ 
-        df['phone_number'] = df['phone_number'].replace({r'\+44': '0', r'\(': '', r'\)': '', r'-': '', r' ': '',r'\^44': '0',r'(?<=\d)x(?=\d)': '#'}, regex=True)
 
         # Create masks for each country
         uk_mask = (df['country_code'] == 'GB') & (~df['phone_number'].str.match(uk_regex_exp))
