@@ -2,3 +2,8 @@ db_creds.yaml
 questions.txt
 local_creds.yaml
 bank.regex.yaml
+legacy_store_details.csv
+legacy_users.csv
+card_details.csv
+clean_dates.csv
+clean_orders.csv
