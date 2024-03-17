@@ -46,3 +46,5 @@ clean_product_data(df): Cleans product data, handling removed status, converting
 clean_orders_data(df): Cleans orders data by dropping specific columns and handling NULL values.
 
 clean_date_details(df): Cleans date details by converting columns to numeric and combining them into a single datetime column.
+
+## Licenses
