@@ -42,8 +42,6 @@ class DataExtractor:
 
         # df = pd.concat(list_data)
         return combined_df
-    
-
 
     #  takes in a link as an argument and returns a pandas DataFrame.
     def list_number_of_stores(self,storenum_endp,header_dict):
@@ -72,6 +70,6 @@ class DataExtractor:
     def extract_from_s3(self,bucket_name,object_key):
         s3 = boto3.client('s3')
         obj = s3.get_object(Bucket=bucket_name, Key=object_key)
-        df = pd.read_csv(obj['Body'])
+        df = pd.read_json(obj['Body'])
         return df
 

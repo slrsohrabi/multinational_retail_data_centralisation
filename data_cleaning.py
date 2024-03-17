@@ -33,12 +33,13 @@ class DataCleaning:
         df = df[df['country_code'].isin(['GB', 'DE', 'US'])]
         df = df.reset_index(drop=True)
         df = df.dropna()
-
         return df
+    
     # Method to only keep alphabetical values
     def keep_alpha(self,val):
         return ''.join(filter(str.isalpha, str(val)))
-
+    
+    # Cleans card data's table's 'expiary_date','date_payment_confirmed' columns to datetime
     def clean_card_data(self,df):
         df = df.dropna()
         df = df.drop_duplicates()
@@ -48,7 +49,7 @@ class DataCleaning:
         df['date_payment_confirmed'] = pd.to_datetime(df['date_payment_confirmed'],format='%Y-%m-%d',errors='coerce')
         # df['card_provider'] = 
         return df
-    
+
     # Read bank account number regex for each bank 
     def read_bank_regex():
         with open('bank_regex.yaml','r') as file:
@@ -62,12 +63,8 @@ class DataCleaning:
             return True
         except ValueError:
             return False
-    
-    def is_money(self, val):
-        val.split('')
-        
 
-          
+    # Clean store data, filter, drop columns, parse datetime, clean text, convert numeric, retain countries."
     def clean_store_data(self,df):
         # Clean by store type
         store_types = ['Local','Super Store','Mall Kiosk','Outlet','Web Portal']
@@ -89,9 +86,9 @@ class DataCleaning:
         df = df.dropna()
         df = df.drop_duplicates()
         return df 
+    
     # converts all weights to "...kg"pattern
     def convert_product_weights(self, val):
-
         multi_pack_pattern_kg = r"\d+ x \d"
         multi_pack_pattern_g = r"\d+ x \d+g"
         if val.endswith('kg'):
@@ -106,33 +103,27 @@ class DataCleaning:
             else:
                 grams = float(val[:-1])
                 kilograms = grams / 1000
-        # elif val.endswith('l'):
-        #     liters = float(val[:-1])
-        #     kilograms = liters 
         elif val.endswith('ml'):
             liters =  float(val[:-2]) / 1000
             kilograms = liters
-
+        
         elif re.match(multi_pack_pattern_kg, val):  # Check if it matches the multi-pack pattern
             parts = val.split(' x ')
             weight_per_unit = int(parts[0])
             quantity = int(parts[1])
             total_weight_g = weight_per_unit * quantity
             kilograms = total_weight_g / 1000
-
         elif val.endswith('m'):
             liters = float(val[:-1])
             kilograms = liters 
-        
         elif val.endswith('oz'):
             grams = float(val[:-2])
             kilograms = grams / 1000
-
         else:
             return val
     
         return float(kilograms)
-
+    
     def clean_product_data(self,df):
         removed_status = ['Still_avaliable', 'Removed'] 
         ok_categories = ['toys-and-games', 'sports-and-leisure','pets', 'homeware','health-and-beauty','food-and-drink', 'diy']
@@ -145,18 +136,39 @@ class DataCleaning:
         df.loc[~df['product_price'].str.startswith('£'), 'product_price'] = pd.NA
         df['category'] = df['category'].where(df['category'].isin(ok_categories), other=pd.NA)
 
-        
         df = df.dropna()
         df = df.drop_duplicates()
-        
-
+    
         return df
+    
+    def clean_orders_data(self,df):
+        df = df.drop(['first_name'], axis=1)
+        df = df.drop(['last_name'], axis=1)
+        df = df.drop(['1'], axis=1)
+
+        df = df.dropna()
+        df = df.drop_duplicates()
+        return df
+    
+    def clean_date_details(self,df):
+        date_columns = ['year', 'month', 'day']
+        for column in date_columns:
+            df[column] = pd.to_numeric(df[column],errors='coerce')
+        # Convert 'timestamp' column to datetime
+        df['timestamp'] = pd.to_datetime(df['timestamp'], format='%H:%M:%S', errors='coerce')  
+
+        df.dropna(subset=['timestamp'], inplace=True)
+        # Combine columns into a single datetime column
+        df['accurate_date'] = pd.to_datetime(df[['year', 'month', 'day']]) + df['timestamp'].apply(lambda x: pd.Timedelta(hours=x.hour, minutes=x.minute, seconds=x.second))
+        return df
+
+
         # # only acceptable providers
         # df = df[df['card_provider'].isin([])]
         # card number regex
         # Clean phone number
 
-        ###help!
+        ###help needed!
         """ 
 
         # Create masks for each country
