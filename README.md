@@ -3,10 +3,10 @@ Consolidation into a single database for a multinational with sales data spread 
 
 # Table of Contents
 1. [Introduction](#introduction)
-2. [Section 1](#Data_Extraction_and_Cleaning_1)
-    - [Subsection 1.1](#Data_Extraction_1.1)
-    - [Subsection 1.2](#data_cleaning_1.2)
-3. [Section 3](#Licenses)
+2. [Data Extraction and Cleaning 1](#Data_Extraction_and_Cleaning_1)
+    - [Data Extraction 1.1](#Data_Extraction_1.1)
+    - [Data Cleaning 1.2](#Data_Cleaning_1.2)
+3. [Licenses](#Licenses)
 
 
 ## Introduction
