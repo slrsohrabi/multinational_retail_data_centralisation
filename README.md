@@ -6,7 +6,7 @@ Consolidation into a single database for a multinational with sales data spread 
 2. [Section 1](#Data_Extraction_and_Cleaning_1)
     - [Subsection 1.1](#Data_Extraction_1.1)
     - [Subsection 1.2](#data_cleaning_1.2)
-2. [Section 3](#Licenses)
+3. [Section 3](#Licenses)
 
 
 ## Introduction
