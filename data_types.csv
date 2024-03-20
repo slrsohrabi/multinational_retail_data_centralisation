@@ -1,0 +1,15 @@
+store_details_table,current_data_type,required_date_type
+longitude,TEXT,FLOAT
+locality,TEXT,VARCHAR(255)
+store_code,TEXT,VARCHAR(?)
+staff_numbers,TEXT,SMALLINT
+opening_date,TEXT,DATE
+store_type,TEXT,VARCHAR(255) NULLABLE
+first_name,TEXT,VARCHAR(255)
+date_of_birth,TEXT,DATE
+country_code,TEXT,VARCHAR(?)
+user_uuid,TEXT,UUID
+join_date,TEXT,DATE
+date_uuid,TEXT,UUID
+card_number,TEXT,VARCHAR(?)
+product_quantity,BIGINT,SMALLINT

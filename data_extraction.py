@@ -15,9 +15,9 @@ class DataExtractor:
             # Insert query
             query = f"SELECT * FROM {table_name}"
             result = conn.execute(query)
-            # Fetch all rows of the result set
+            # Fetch all rows of the result.
             data = result.fetchall()
-            # Get column names from the result object
+            # Get column names from the result.
             columns = result.keys()
         return data, columns
     
@@ -72,4 +72,6 @@ class DataExtractor:
         obj = s3.get_object(Bucket=bucket_name, Key=object_key)
         df = pd.read_json(obj['Body'])
         return df
+    
+
 
