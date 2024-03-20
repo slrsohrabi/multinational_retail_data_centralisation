@@ -170,7 +170,13 @@ class DataCleaning:
             for i, row in df.iterrows():
                 # ALTER TABLE query for each row
                 # if row['store_details_table'] == table.column
-                query = f"ALTER TABLE {table} ALTER COLUMN {row['store_details_table']} TYPE {row['required_date_type']} USING {row['store_details_table']}::{row['required_date_type']} WHERE COLUMN = row['required_data_type'];"
+                query =   f'''
+                          ALTER TABLE {table}
+                          ALTER COLUMN {row['store_details_table']} TYPE
+                          {row['required_date_type']} USING
+                          {row['store_details_table']}::{row['required_date_type']}
+                          WHERE COLUMN = row['store_details_table'];
+                          '''
                 q_exec = conn.execute(query)
         
         return "query successful"
